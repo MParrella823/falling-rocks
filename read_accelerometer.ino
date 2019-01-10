@@ -10,13 +10,13 @@ void setup(void) {
     Serial.println("Couldnt start");
     while (1);
   }
-  //Set accelerometer to +-2g mode (available modes: 2g,4g,8g)  
+  //Set accelerometer to +-2g mode (available modes: 2g,4g,8g)
   mma.setRange(MMA8451_RANGE_2_G);
 }
 
 void loop() {
-  /* Get a new sensor event */ 
-  sensors_event_t event; 
+  /* Get a new sensor event */
+  sensors_event_t event;
   mma.getEvent(&event); // get data from accelerometer
   // print data to serial port - format: x,y
   Serial.print(event.acceleration.x); Serial.print(",");
