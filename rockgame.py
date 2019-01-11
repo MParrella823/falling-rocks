@@ -271,7 +271,7 @@ def game_loop():
 
                     i = 10
                     while i > 0:
-                        delta_speed = -.5
+                        delta_speed = -.5 
                         delta_speed = .5
                         if event.type == pygame.KEYDOWN:
                             if event.key == pygame.K_LEFT:
