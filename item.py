@@ -34,7 +34,7 @@ class Item:
     def getType(self):
         return self.__type
 
-    def setImage(self, type):
+    def setImage(self, image):
       self.__image = image
 
     def getImage(self):
