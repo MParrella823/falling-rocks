@@ -269,10 +269,15 @@ def game_loop():
                 # Implement frozen character logic (greatly slows player speed)
                 if (item.getType() == Ice):
 
+                    # Set duration of effect
                     i = 10
+                    
                     while i > 0:
-                        delta_speed = -.5 
+                        # stop player character when Ice is encountered
+                        delta_speed = -.5
                         delta_speed = .5
+
+                        # ignore keyboard input
                         if event.type == pygame.KEYDOWN:
                             if event.key == pygame.K_LEFT:
                                 key_x = -0.00
