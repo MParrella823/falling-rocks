@@ -266,10 +266,13 @@ def game_loop():
 
         for item in itemList:
             if player_collide(item.getXpos(), item.getYpos(), player_x, player_y):
-                # Implement frozen character logic
+                # Implement frozen character logic (greatly slows player speed)
                 if (item.getType() == Ice):
-                    i = 5
+
+                    i = 10
                     while i > 0:
+                        delta_speed = -.5
+                        delta_speed = .5
                         if event.type == pygame.KEYDOWN:
                             if event.key == pygame.K_LEFT:
                                 key_x = -0.00
