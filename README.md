@@ -1,2 +1,3 @@
-# falling-rocks
-A simple video game used to introduce students to programming concepts
+# Ice Enhancement branch
+
+This branch deals with the development of the added 'Ice' object, which will temporarily 'freeze' the players character movement
