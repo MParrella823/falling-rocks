@@ -271,8 +271,8 @@ def game_loop():
 
                     # Set duration of effect
                     i = 10
-                    
-                    while i > 0:
+
+                    while i > 0: 
                         # stop player character when Ice is encountered
                         delta_speed = -.5
                         delta_speed = .5
