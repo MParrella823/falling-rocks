@@ -3,6 +3,8 @@ import random
 import serial
 import time
 import random
+import sys
+from item import *
 from rock import *
 from ice import *
 
@@ -23,15 +25,29 @@ clock = pygame.time.Clock()
 
 rocklist = []     # Create an empty list to hold our rocks
 numRocks = 7    # Specify the number of rocks to create
+
 icelist = []  # Create list for Ice objects
-numIce = 1
-rockImage = 'rock2.png'
-iceImage = 'ice.gif'
+numIce = 3
+
+rockImage = 'rock.png'
+iceImage = 'ice.png'
+
+itemList = [] # Create list for all falling objects
+numItems = len(itemList)
+print(numItems)
 imageWidth = 125
 imageHeight = 125
 playerImg = pygame.image.load('you-rock2.png')
 playerImg_width = 125
 playerImg_height = 100
+
+
+rockImageFile = "rock2.png"
+iceImageFile = "ice.gif"
+
+rockImage = pygame.image.load(rockImageFile)
+iceImage = pygame.image.load(iceImageFile)
+
 
 use_port = False
 
@@ -40,7 +56,6 @@ def serialRead(ser):
     line = ser.readline().decode('ascii')
     xy = line.strip().split(',')
     return xy
-
 
 def speedDelta(ser):
     delta = 0
@@ -58,28 +73,27 @@ def speedDelta(ser):
 # Create our rocks using the the specified image
 # Initially, our position (x,y) will be set to (0,0) and speed will be 0.
 
-
 def init_rocks():
     for i in range(0, numRocks):
-        rock = Rock(0, 0, 0, pygame.image.load(rockImage))
-        rocklist.append(rock)
+        item = Item(0, 0, 0, rockImage, Rock)
+        itemList.append(item)
 
 
 def init_ice():
     for i in range(0, numIce):
-        ice = Ice(0, 0, 0, pygame.image.load(iceImage))
-        icelist.append(ice)
-
-# a function to place the car in our surface
+        item = Item(0, 0, 0, iceImage, Ice)
+        itemList.append(item)
 
 
-def show_rock(rock):
+
+
+def show_item(item):
     # blit is displaying image xy is a tuple
-    gameDisplay.blit(rock.getImage(), (rock.getXpos(), rock.getYpos()))
+    gameDisplay.blit(item.getImage(), (item.getXpos(), item.getYpos()))
 
 
-def show_ice(ice):
-    gameDisplay.blit(ice.getImage(), (ice.getXpos(), ice.getYpos()))
+#def show_ice(ice):
+ #   gameDisplay.blit(ice.getImage(), (ice.getXpos(), ice.getYpos()))
 
 # a function to place the player ioon in our surface
 
@@ -118,6 +132,8 @@ def player_collide(x1, y1, x2, y2):
     else:
         return False
 
+# Combine all object lists
+itemList = icelist + rocklist
 
 def game_loop():
     game_score = 0
@@ -129,18 +145,33 @@ def game_loop():
     ser = None
     key_x = 0
 
+
     # Update each rock in the rocklist
-    for rock in rocklist:
+    #for rock in rocklist:
         # subtract the width of the image
-        rock.setXpos(random.randrange(0, display_width-imageWidth))
-        rock.setYpos(-125)
-        rock.setSpeed(random.randrange(1, 7))
+       # rock.setXpos(random.randrange(0, display_width-imageWidth))
+        #rock.setYpos(-125)
+        #rock.setSpeed(random.randrange(1, 7))
 
-    for ice in icelist:
-        ice.setXpos(random.randrange(0, display_width-imageWidth))
-        ice.setYpos(-125)
-        ice.setSpeed(random.randrange(1, 7))
+   # for ice in icelist:
+    #    ice.setXpos(random.randrange(0, display_width-imageWidth))
+     #   ice.setYpos(-125)
+      #  ice.setSpeed(random.randrange(1, 7))
 
+
+    #for ice in icelist:
+     #   ice.setXpos(random.randrange(0, display_width-imageWidth))
+      #  ice.setYpos(-125)
+       # ice.setSpeed(random.randrange(1, 7))
+
+
+    for item in itemList:
+        item.setXpos(random.randrange(0, display_width - imageWidth))
+        item.setYpos(-125)
+        item.setSpeed(random.randrange(1,7))
+
+
+    #TODO: Comment out below code, check functionality of accelerometer
     # open port to read accelerometer data from Arduino
     if use_port:
         # Arduino serial communication
@@ -177,6 +208,7 @@ def game_loop():
 
         gameDisplay.fill(white)
         j = 0
+        """
         for rock in rocklist:
             # changing the y coordinate to make rocks move
             rock.setYpos(rock.getYpos() + rock.getSpeed())
@@ -207,16 +239,47 @@ def game_loop():
                 ice.setXpos(random.randrange(0, display_width-imageWidth))
                 ice.setSpeed(random.randrange(1, 7))
 
-            j += 1
+
             for i in range(j, numIce):
                 if check_collision(ice, icelist[i], imageWidth, imageHeight) and (not(ice.getYpos == -125)):
                     ice.setYpos(-125)
                     ice.setXpos(random.randrange(0, display_width-imageWidth))
                     ice.setSpeed(random.randrange(1, 7))
+            """
 
-        for rock in rocklist:
-            if player_collide(rock.getXpos(), rock.getYpos(), player_x, player_y):
+        for item in itemList:
+
+                item.setYpos(item.getYpos() + item.getSpeed())
+                show_item(item)
+
+                if item.getYpos() > display_height:
+                    item.setYpos(-125)
+                    item.setXpos(random.randrange(0, display_width-imageWidth))
+
+
+                j+=1
+                for i in range(j, len(itemList)):
+                    if check_collision(item, itemList[i], imageWidth, imageHeight) and (not(item.getYpos == -125)):
+                        item.setYpos(-125)
+                        item.setXpos(random.randrange(0, display_width))
+                        item.setSpeed(random.randrange(1, 7))
+
+        for item in itemList:
+            if player_collide(item.getXpos(), item.getYpos(), player_x, player_y):
                 gameExit = True
+        """
+        for ice in icelist:
+           if player_collide(ice.getXpos(), ice.getYpos(), player_x, player_y):
+               for i in 100:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_LEFT:
+                        key_x = -0.00
+                    if event.key == pygame.K_RIGHT:
+                        key_x = 0.00
+                    if event.key == pygame.K_DOWN:
+                        delta_speed = 0
+                i+=1
+        """
 
         player(player_x, player_y)
         #gameDisplay.blit(disclaimertext, (5, 5))
@@ -244,8 +307,8 @@ if __name__ == "__main__":
     disclaimertext = myfont.render(
         "Copyright 2018, The College of Saint Rose", 1, (0, 0, 0))
 
-    init_rocks()
     init_ice()
+    init_rocks()
     game_loop()
     # to quit you need to stop pygame
     pygame.quit()
