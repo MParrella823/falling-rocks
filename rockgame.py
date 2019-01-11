@@ -266,13 +266,14 @@ def game_loop():
 
         for item in itemList:
             if player_collide(item.getXpos(), item.getYpos(), player_x, player_y):
+                
                 # Implement frozen character logic (greatly slows player speed)
                 if (item.getType() == Ice):
 
                     # Set duration of effect
                     i = 10
 
-                    while i > 0: 
+                    while i > 0:
                         # stop player character when Ice is encountered
                         delta_speed = -.5
                         delta_speed = .5
