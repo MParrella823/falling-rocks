@@ -266,7 +266,20 @@ def game_loop():
 
         for item in itemList:
             if player_collide(item.getXpos(), item.getYpos(), player_x, player_y):
-                gameExit = True
+                # Implement frozen character logic
+                if (item.getType() == Ice):
+                    i = 5
+                    while i > 0:
+                        if event.type == pygame.KEYDOWN:
+                            if event.key == pygame.K_LEFT:
+                                key_x = -0.00
+                            if event.key == pygame.K_RIGHT:
+                                key_x = 0.00
+                            if event.key == pygame.K_DOWN:
+                                delta_speed = 0
+                        i-=1
+                else:
+                    gameExit = True
         """
         for ice in icelist:
            if player_collide(ice.getXpos(), ice.getYpos(), player_x, player_y):
