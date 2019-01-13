@@ -1,5 +1,6 @@
 #include <Adafruit_MMA8451.h>
 #include <Adafruit_Sensor.h>
+#import Serial
 
 Adafruit_MMA8451 mma = Adafruit_MMA8451();
 
@@ -10,7 +11,8 @@ void setup(void)
   if (!mma.begin())
   {
     Serial.println("Couldnt start");
-    while (1);
+    while (1)
+      ;
   }
   //Set accelerometer to +-2g mode (available modes: 2g,4g,8g)
   mma.setRange(MMA8451_RANGE_2_G);

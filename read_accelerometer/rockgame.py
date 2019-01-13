@@ -23,6 +23,8 @@ pygame.display.set_caption(
     'Rocky Start - Copyright 2018, The College of Saint Rose')
 clock = pygame.time.Clock()
 
+
+
 rocklist = []     # Create an empty list to hold our rocks
 numRocks = 7    # Specify the number of rocks to create
 
@@ -32,7 +34,7 @@ numIce = 3
 rockImage = 'rock.png'
 iceImage = 'ice.png'
 
-itemList = [] # Create list for all falling objects
+itemList = []  # Create list for all falling objects
 numItems = len(itemList)
 
 imageWidth = 125
@@ -49,13 +51,14 @@ rockImage = pygame.image.load(rockImageFile)
 iceImage = pygame.image.load(iceImageFile)
 
 
-use_port = True
+use_port = False
 
 
 def serialRead(ser):
     line = ser.readline().decode('ascii')
     xy = line.strip().split(',')
     return xy
+
 
 def speedDelta(ser):
     delta = 0
@@ -73,6 +76,7 @@ def speedDelta(ser):
 # Create our rocks using the the specified image
 # Initially, our position (x,y) will be set to (0,0) and speed will be 0.
 
+
 def init_rocks():
     for i in range(0, numRocks):
         item = Item(0, 0, 0, rockImage, Rock)
@@ -85,14 +89,12 @@ def init_ice():
         itemList.append(item)
 
 
-
-
 def show_item(item):
     # blit is displaying image xy is a tuple
     gameDisplay.blit(item.getImage(), (item.getXpos(), item.getYpos()))
 
 
-#def show_ice(ice):
+# def show_ice(ice):
  #   gameDisplay.blit(ice.getImage(), (ice.getXpos(), ice.getYpos()))
 
 # a function to place the player ioon in our surface
@@ -108,9 +110,16 @@ def score(s):
     gameDisplay.blit(scoretext, (5, 5))
 
 
-def gameover():
+def gameover(s):
+    finalScoreText = gofont.render("Final Score: {0}".format(s), 1, (0,0,0))
     gameovertext = gofont.render("GAME OVER", 1, (0, 0, 0))
     gameDisplay.blit(gameovertext, (display_width/2 - 150, display_height/2))
+    gameDisplay.blit(finalScoreText, (display_width/2 - 150, (display_height / 2) + 50))
+
+
+def livesDisplay(numLives):
+    numLivesText = myfont.render("Lives: {0}".format(numLives), 1, (0, 0, 0))
+    gameDisplay.blit(numLivesText, (5, 20))
 
 # check if there was a collision between 2 items
 
@@ -132,11 +141,21 @@ def player_collide(x1, y1, x2, y2):
     else:
         return False
 
+
 # Combine all object lists
 itemList = icelist + rocklist
 
+global numLives
+numLives = 3
+
+global totalScore
+totalScore = 0
+
 def game_loop():
-    game_score = 0
+
+    global numLives
+    global totalScore
+
     delta_speed = 0
     delta = 0
     player_x = (display_width*0.5) - (0.5*playerImg_width)
@@ -145,39 +164,18 @@ def game_loop():
     ser = None
     key_x = 0
 
-
-    # Update each rock in the rocklist
-    #for rock in rocklist:
-        # subtract the width of the image
-       # rock.setXpos(random.randrange(0, display_width-imageWidth))
-        #rock.setYpos(-125)
-        #rock.setSpeed(random.randrange(1, 7))
-
-   # for ice in icelist:
-    #    ice.setXpos(random.randrange(0, display_width-imageWidth))
-     #   ice.setYpos(-125)
-      #  ice.setSpeed(random.randrange(1, 7))
-
-
-    #for ice in icelist:
-     #   ice.setXpos(random.randrange(0, display_width-imageWidth))
-      #  ice.setYpos(-125)
-       # ice.setSpeed(random.randrange(1, 7))
-
-
     for item in itemList:
         item.setXpos(random.randrange(0, display_width - imageWidth))
         item.setYpos(-125)
-        item.setSpeed(random.randrange(1,7))
+        item.setSpeed(random.randrange(1, 7))
 
-
-    #TODO: Comment out below code, check functionality of accelerometer
+    # TODO: Comment out below code, check functionality of accelerometer
     # open port to read accelerometer data from Arduino
     if use_port:
         # Arduino serial communication
-        ser = serial.Serial('COM3', 9600, timeout=10)
+        ser = serial.Serial('COM3', 9600, timeout=1)
 
-    while not gameExit:
+    while numLives > 0:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -208,61 +206,22 @@ def game_loop():
 
         gameDisplay.fill(white)
         j = 0
-        """
-        for rock in rocklist:
-            # changing the y coordinate to make rocks move
-            rock.setYpos(rock.getYpos() + rock.getSpeed())
-            show_rock(rock)
-
-            # Reset rock to top of screen if it fell below bottom
-
-            if rock.getYpos() > display_height:
-                rock.setYpos(-125)
-                # subtract the width of the image
-                rock.setXpos(random.randrange(0, display_width-imageWidth))
-                rock.setSpeed(random.randrange(1, 7))
-
-            j += 1
-            for i in range(j, numRocks):
-                if check_collision(rock, rocklist[i], imageWidth, imageHeight)and(not (rock.getYpos == -125)):
-                    rock.setYpos(-125)
-                    # subtract the width of the image
-                    rock.setXpos(random.randrange(0, display_width-imageWidth))
-                    rock.setSpeed(random.randrange(1, 7))
-
-        for ice in icelist:
-            ice.setYpos(rock.getYpos() + ice.getSpeed())
-            show_ice(ice)
-
-            if ice.getYpos() > display_height:
-                ice.setYpos(-125)
-                ice.setXpos(random.randrange(0, display_width-imageWidth))
-                ice.setSpeed(random.randrange(1, 7))
-
-
-            for i in range(j, numIce):
-                if check_collision(ice, icelist[i], imageWidth, imageHeight) and (not(ice.getYpos == -125)):
-                    ice.setYpos(-125)
-                    ice.setXpos(random.randrange(0, display_width-imageWidth))
-                    ice.setSpeed(random.randrange(1, 7))
-            """
 
         for item in itemList:
 
-                item.setYpos(item.getYpos() + item.getSpeed())
-                show_item(item)
+            item.setYpos(item.getYpos() + item.getSpeed())
+            show_item(item)
 
-                if item.getYpos() > display_height:
+            if item.getYpos() > display_height:
+                item.setYpos(-125)
+                item.setXpos(random.randrange(0, display_width-imageWidth))
+
+            j += 1
+            for i in range(j, len(itemList)):
+                if check_collision(item, itemList[i], imageWidth, imageHeight) and (not(item.getYpos == -125)):
                     item.setYpos(-125)
-                    item.setXpos(random.randrange(0, display_width-imageWidth))
-
-
-                j+=1
-                for i in range(j, len(itemList)):
-                    if check_collision(item, itemList[i], imageWidth, imageHeight) and (not(item.getYpos == -125)):
-                        item.setYpos(-125)
-                        item.setXpos(random.randrange(0, display_width))
-                        item.setSpeed(random.randrange(1, 7))
+                    item.setXpos(random.randrange(0, display_width))
+                    item.setSpeed(random.randrange(1, 7))
 
         for item in itemList:
             if player_collide(item.getXpos(), item.getYpos(), player_x, player_y):
@@ -271,7 +230,7 @@ def game_loop():
                 if (item.getType() == Ice):
 
                     # Set duration of effect
-                    i = 10
+                    i = 15
 
                     while i > 0:
                         # stop player character when Ice is encountered
@@ -286,27 +245,24 @@ def game_loop():
                                 key_x = 0.00
                             if event.key == pygame.K_DOWN:
                                 delta_speed = 0
-                        i-=1
+                        i -= 1
                 else:
-                    gameExit = True
-        """
-        for ice in icelist:
-           if player_collide(ice.getXpos(), ice.getYpos(), player_x, player_y):
-               for i in 100:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_LEFT:
-                        key_x = -0.00
-                    if event.key == pygame.K_RIGHT:
-                        key_x = 0.00
-                    if event.key == pygame.K_DOWN:
-                        delta_speed = 0
-                i+=1
-        """
+                    if (numLives > 0):
+                        print("Entered numLives if")
+                        print("numLives: %d" % numLives)
+
+                        numLives -= 1
+                        game_loop()
+
+
+                    else:
+                        gameExit = True
 
         player(player_x, player_y)
         #gameDisplay.blit(disclaimertext, (5, 5))
-        game_score += 10
-        score(game_score)
+        totalScore += 10
+        livesDisplay(numLives)
+        score(totalScore)
         pygame.display.update()
         clock.tick(50)
 
@@ -315,9 +271,11 @@ def game_loop():
     gameDisplay.fill(white)
     player(player_x, player_y)
     # gameDisplay.blit(disclaimertext, (5, 5))
-    game_score += 10
-    score(game_score)
-    gameover()
+    totalScore += 10
+
+    score(totalScore)
+
+    gameover(totalScore)
     pygame.display.update()
     time.sleep(5)
 
