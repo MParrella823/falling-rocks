@@ -244,7 +244,7 @@ def game_loop():
                 if (item.getType() == Ice):
 
                     # Set duration of effect
-                    i = 15
+                    i = 25
 
                     while i > 0:
                         # stop player character when Ice is encountered
@@ -254,9 +254,11 @@ def game_loop():
                         # ignore keyboard input
                         if event.type == pygame.KEYDOWN:
                             if event.key == pygame.K_LEFT:
-                                key_x = -0.00
+                                key_x = 0.00
+                                speedDelta = 0
                             if event.key == pygame.K_RIGHT:
                                 key_x = 0.00
+                                speedDelta = 0
                             if event.key == pygame.K_DOWN:
                                 delta_speed = 0
                         i -= 1
