@@ -7,6 +7,7 @@ import sys
 from item import *
 from rock import *
 from ice import *
+from one_up import *
 
 pygame.init()
 display_width = 800
@@ -23,6 +24,8 @@ pygame.display.set_caption(
     'Rocky Start - Copyright 2018, The College of Saint Rose')
 clock = pygame.time.Clock()
 
+oneUpList = [] # Create an empty list to hold one-up power ups
+numOneUps = 1 # Number of one-ups
 
 
 rocklist = []     # Create an empty list to hold our rocks
@@ -31,8 +34,8 @@ numRocks = 7    # Specify the number of rocks to create
 icelist = []  # Create list for Ice objects
 numIce = 3
 
-rockImage = 'rock.png'
-iceImage = 'ice.png'
+
+
 
 itemList = []  # Create list for all falling objects
 numItems = len(itemList)
@@ -46,9 +49,11 @@ playerImg_height = 100
 
 rockImageFile = "rock2.png"
 iceImageFile = "ice.gif"
+oneUpImageFile = "one_up.png"
 
 rockImage = pygame.image.load(rockImageFile)
 iceImage = pygame.image.load(iceImageFile)
+oneUpImage = pygame.image.load(oneUpImageFile)
 
 
 use_port = False
@@ -86,6 +91,11 @@ def init_rocks():
 def init_ice():
     for i in range(0, numIce):
         item = Item(0, 0, 0, iceImage, Ice)
+        itemList.append(item)
+
+def init_oneups():
+    for i in range(0, numOneUps):
+        item = Item(0, 0, 0, oneUpImage, One_up)
         itemList.append(item)
 
 
@@ -227,6 +237,10 @@ def game_loop():
             if player_collide(item.getXpos(), item.getYpos(), player_x, player_y):
 
                 # Implement frozen character logic (greatly slows player speed)
+                if (item.getType() == One_up):
+                    numLives += 1
+                    game_loop()
+
                 if (item.getType() == Ice):
 
                     # Set duration of effect
@@ -248,12 +262,9 @@ def game_loop():
                         i -= 1
                 else:
                     if (numLives > 0):
-                        print("Entered numLives if")
                         print("numLives: %d" % numLives)
-
                         numLives -= 1
                         game_loop()
-
 
                     else:
                         gameExit = True
@@ -271,10 +282,8 @@ def game_loop():
     gameDisplay.fill(white)
     player(player_x, player_y)
     # gameDisplay.blit(disclaimertext, (5, 5))
-    totalScore += 10
-
     score(totalScore)
-
+    livesDisplay(numLives)
     gameover(totalScore)
     pygame.display.update()
     time.sleep(5)
@@ -289,6 +298,7 @@ if __name__ == "__main__":
 
     init_ice()
     init_rocks()
+    init_oneups()
     game_loop()
     # to quit you need to stop pygame
     pygame.quit()
