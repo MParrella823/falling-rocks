@@ -34,7 +34,7 @@ iceImage = 'ice.png'
 
 itemList = [] # Create list for all falling objects
 numItems = len(itemList)
-print(numItems)
+
 imageWidth = 125
 imageHeight = 125
 playerImg = pygame.image.load('you-rock2.png')
@@ -176,6 +176,7 @@ def game_loop():
     if use_port:
         # Arduino serial communication
         ser = serial.Serial('COM3', 9600, timeout=1)
+
 
     while not gameExit:
         for event in pygame.event.get():
