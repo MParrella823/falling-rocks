@@ -175,8 +175,7 @@ def game_loop():
     # open port to read accelerometer data from Arduino
     if use_port:
         # Arduino serial communication
-        ser = serial.Serial('COM3', 9600, timeout=1)
-
+        ser = serial.Serial('COM3', 9600, timeout=10)
 
     while not gameExit:
         for event in pygame.event.get():
