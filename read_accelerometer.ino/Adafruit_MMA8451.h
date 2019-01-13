@@ -1,3 +1,6 @@
+#include <Adafruit_CircuitPlayground.h>
+#include <Adafruit_Circuit_Playground.h>
+
 /**************************************************************************/
 /*!
     @file     Adafruit_MMA8451.h
@@ -120,4 +123,3 @@ class Adafruit_MMA8451
 };
 
 #endif
-
