@@ -35,8 +35,6 @@ icelist = []  # Create list for Ice objects
 numIce = 3
 
 
-
-
 itemList = []  # Create list for all falling objects
 numItems = len(itemList)
 
@@ -56,7 +54,7 @@ iceImage = pygame.image.load(iceImageFile)
 oneUpImage = pygame.image.load(oneUpImageFile)
 
 
-use_port = False
+use_port = True
 
 
 def serialRead(ser):
@@ -64,19 +62,6 @@ def serialRead(ser):
     xy = line.strip().split(',')
     return xy
 
-
-def speedDelta(ser):
-    delta = 0
-    accel = serialRead(ser)
-    print(accel)
-
-    if len(accel) == 2:
-        if len(accel[0]) > 0 and float(accel[0]) < -0.25:
-            delta = -1
-        elif len(accel[0]) > 0 and float(accel[0]) > 0.25:
-            delta = 1
-
-    return delta
 
 # Create our rocks using the the specified image
 # Initially, our position (x,y) will be set to (0,0) and speed will be 0.
@@ -93,6 +78,7 @@ def init_ice():
         item = Item(0, 0, 0, iceImage, Ice)
         itemList.append(item)
 
+
 def init_oneups():
     for i in range(0, numOneUps):
         item = Item(0, 0, 0, oneUpImage, One_up)
@@ -102,12 +88,6 @@ def init_oneups():
 def show_item(item):
     # blit is displaying image xy is a tuple
     gameDisplay.blit(item.getImage(), (item.getXpos(), item.getYpos()))
-
-
-# def show_ice(ice):
- #   gameDisplay.blit(ice.getImage(), (ice.getXpos(), ice.getYpos()))
-
-# a function to place the player ioon in our surface
 
 
 def player(x, y):
@@ -161,7 +141,24 @@ numLives = 3
 global totalScore
 totalScore = 0
 
+
+if use_port:
+   global ser
+   ser = serial.Serial('COM3', 9600, timeout=1)
+
 def game_loop():
+    global ser
+    def speedDelta(ser):
+        delta = 0
+        accel = serialRead(ser)
+        print(accel)
+        if len(accel) == 2:
+            if len(accel[0]) > 0 and float(accel[0]) < -0.25:
+                delta = -1
+            elif len(accel[0]) > 0 and float(accel[0]) > 0.25:
+                delta = 1
+        return delta
+
 
     global numLives
     global totalScore
@@ -171,7 +168,7 @@ def game_loop():
     player_x = (display_width*0.5) - (0.5*playerImg_width)
     player_y = (display_height-playerImg_height)
     gameExit = False
-    ser = None
+
     key_x = 0
 
     for item in itemList:
@@ -181,9 +178,7 @@ def game_loop():
 
     # TODO: Comment out below code, check functionality of accelerometer
     # open port to read accelerometer data from Arduino
-    if use_port:
-        # Arduino serial communication
-        ser = serial.Serial('COM3', 9600, timeout=1)
+
 
     while numLives > 0:
         for event in pygame.event.get():
@@ -192,6 +187,7 @@ def game_loop():
                 quit()
 
             key_x = 0
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
                     key_x = -0.20
@@ -237,11 +233,11 @@ def game_loop():
             if player_collide(item.getXpos(), item.getYpos(), player_x, player_y):
 
                 # Implement frozen character logic (greatly slows player speed)
-                if (item.getType() == One_up):
+                if item.getType() == One_up:
                     numLives += 1
                     game_loop()
 
-                if (item.getType() == Ice):
+                if item.getType() == Ice:
 
                     # Set duration of effect
                     i = 25
@@ -251,16 +247,20 @@ def game_loop():
                         delta_speed = -.5
                         delta_speed = .5
 
-                        # ignore keyboard input
-                        if event.type == pygame.KEYDOWN:
-                            if event.key == pygame.K_LEFT:
-                                key_x = 0.00
-                                speedDelta = 0
-                            if event.key == pygame.K_RIGHT:
-                                key_x = 0.00
-                                speedDelta = 0
-                            if event.key == pygame.K_DOWN:
-                                delta_speed = 0
+                        if use_port:
+                            delta = 0
+
+                        else:
+                            # ignore keyboard input
+                            if event.type == pygame.KEYDOWN:
+                                if event.key == pygame.K_LEFT:
+                                    key_x = 0.00
+                                    speedDelta = 0
+                                if event.key == pygame.K_RIGHT:
+                                    key_x = 0.00
+                                    speedDelta = 0
+                                if event.key == pygame.K_DOWN:
+                                    delta_speed = 0
                         i -= 1
                 else:
                     if (numLives > 0):
