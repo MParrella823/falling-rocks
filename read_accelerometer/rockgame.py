@@ -24,8 +24,8 @@ pygame.display.set_caption(
     'Rocky Start - Copyright 2018, The College of Saint Rose')
 clock = pygame.time.Clock()
 
-oneUpList = [] # Create an empty list to hold one-up power ups
-numOneUps = 1 # Number of one-ups
+oneUpList = []  # Create an empty list to hold one-up power ups
+numOneUps = 1  # Number of one-ups
 
 
 rocklist = []     # Create an empty list to hold our rocks
@@ -232,11 +232,12 @@ def game_loop():
         for item in itemList:
             if player_collide(item.getXpos(), item.getYpos(), player_x, player_y):
 
-                # Implement frozen character logic (greatly slows player speed)
+                # implement "one up" logic
                 if item.getType() == One_up:
                     numLives += 1
                     game_loop()
 
+                # Implement frozen character logic (greatly slows player speed)
                 if item.getType() == Ice:
 
                     # Set duration of effect
